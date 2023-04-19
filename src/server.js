@@ -1,4 +1,5 @@
 import Hapi from '@hapi/hapi';
+import routes from './routes';
 
 const start = async() =>{
     // setting up the Hapi server
@@ -9,17 +10,15 @@ const start = async() =>{
         host:'localhost',
     });
 
-    server.route({
-        method: 'GET', // endpoint
-        path: '/hello',
-        // it is a callback function which will get called whenever the server the correct type of request on the endpoint specified
-        // req: contains details about the requests received
-        // h: response toolkit
-        // anything returned from handler will be sent back to the clients as a response
-        handler: (req, h) => {
-            return 'Hello!';
-        }
-    });
+    // it is a callback function which will get called whenever the server the correct type of request on the endpoint specified
+    // req: contains details about the requests received
+    // h: response toolkit
+    // anything returned from handler will be sent back to the clients as a response
+    //handler: (req, h) => {}
+
+    routes.forEach(route => server.route(route));
+
+    
 
     await server.start();
     console.log(`Server is listening on port ${server.info.uri}`); // gives basic path to access the server from
