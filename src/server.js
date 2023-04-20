@@ -1,9 +1,12 @@
 import Hapi from '@hapi/hapi';
 import routes from './routes';
+import db from './database';
+
+let server;
 
 const start = async() =>{
     // setting up the Hapi server
-    const server = Hapi.server({
+    server = Hapi.server({
         // set up the port on which the server should start on
         // Aka passing in the configuration objectt
         port: 8000,
@@ -18,7 +21,7 @@ const start = async() =>{
 
     routes.forEach(route => server.route(route));
 
-    
+    db.connect();
 
     await server.start();
     console.log(`Server is listening on port ${server.info.uri}`); // gives basic path to access the server from
@@ -29,6 +32,14 @@ process.on('unhandledRejection', err =>{
     console.log(err);
     process.traceDeprecation(1);
 });
+
+process.on('SIGINT', async () =>{
+    console.log('Stopping server...');
+    await server.stop({ timeout: 10000 });
+    db.end();
+    console.log('Server stopped');
+    process.exit(0);
+})
 
 // call function to start up the server
 start();
